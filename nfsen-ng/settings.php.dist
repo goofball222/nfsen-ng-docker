@@ -10,10 +10,10 @@
 $nfsen_config = [
     'general' => [
         'ports' => [
-            22, 23, 53, 80, 161, 443, 853, 32400,
+            80, 22, 53,
         ],
         'sources' => [
-            'router',  // DO NOT ALTER THIS LINE, it will be modified by entrypoint.sh
+            'source1', 'source2',
         ],
         'db' => 'RRD',
         'processor' => 'NfDump',
@@ -36,7 +36,7 @@ $nfsen_config = [
         ],
     ],
     'nfdump' => [
-        'binary' => '/usr/local/bin/nfdump',
+        'binary' => '/usr/bin/nfdump',
         'profiles-data' => '/var/nfdump/profiles-data',
         'profile' => 'live',
         'max-processes' => 1, // maximum number of concurrently running nfdump processes

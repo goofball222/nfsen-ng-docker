@@ -4,5 +4,6 @@ sed -e "s/'router',/$sources/" /var/www/html/backend/settings/settings.tmpl > /v
 
 if php -f backend/settings/settings.php; then
     /var/www/html/backend/cli.php start
+#    apachectl -D FOREGROUND
     apache2-foreground
 fi

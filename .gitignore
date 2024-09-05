@@ -1,0 +1,7 @@
+*.mk
+*.dmk
+*.sw?
+*~
+tmp/*
+bork/
+debug/

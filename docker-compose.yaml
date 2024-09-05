@@ -1,21 +1,76 @@
-version: '2'
+networks:
+  proxy:
+    name: proxy
+    external: true
 
 services:
-
   nfsen:
     build: nfsen-ng
-    ports:
-    - 81:80
-    volumes:
-    - ./profiles-data:/var/nfdump/profiles-data
-    - ./sources.conf:/tmp/sources.conf:ro
+    container_name: nfsen-ng
+    hostname: nfsen-ng
     restart: unless-stopped
-    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - proxy
+    #ports:
+      #- 81:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./php.ini:/usr/local/etc/php/php.ini
+      - ./data:/var/nfdump/profiles-data
+      - ./sources.conf:/tmp/sources.conf:ro
+    environment:
+      - TZ=America/Phoenix
+    healthcheck:
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+      disable: true
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      ## HTTP Routers
+      - traefik.http.routers.nfsen-ng-rtr.entrypoints=https
+      - traefik.http.routers.nfsen-ng-rtr.rule=Host(`nfsen-ng.domain-name`)
+      - traefik.http.routers.nfsen-ng-rtr.tls=true
+      ## Middlewares
+      #- traefik.http.routers.nfsen-ng-rtr.middlewares=chain-no-auth@file # No Authentication
+      #- traefik.http.routers.nfsen-ng-rtr.middlewares=chain-basic-auth@file # Basic Authentication
+      - traefik.http.routers.nfsen-ng-rtr.middlewares=chain-oauth@file # Google OAuth 2.0
+      ## HTTP Services
+      - traefik.http.routers.nfsen-ng-rtr.service=nfsen-ng-svc
+      #- traefik.http.services.nfsen-ng-svc.loadbalancer.server.scheme=https
+      - traefik.http.services.nfsen-ng-svc.loadbalancer.server.port=80
+
   nfdump:
     build: nfdump
-    ports:
-    - 9000-9099:9000-9099/udp
-    volumes:
-    - ./profiles-data:/data
-    - ./sources.conf:/tmp/sources.conf:ro
+    container_name: nfdump
+    hostname: nfdump
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - proxy
+    ports:
+      - 6343:6343/udp
+      #- 9000-9099:9000-9099/udp
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/data
+      - ./sources.conf:/tmp/sources.conf:ro
+    environment:
+      - TZ=America/Phoenix
+    healthcheck:
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+      disable: true

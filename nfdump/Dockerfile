@@ -1,9 +1,11 @@
-FROM debian:10
+FROM alpine:edge
 
-RUN apt update \
-    && apt install -y nfdump \
-    && apt-get install -y nfdump-sflow \
-    && apt install -y procps
+RUN apk update \
+    && apk add bash \
+    && apk add nfdump \
+    && apk add procps \
+    && apk add sfcapd \
+    && apk add tzdata
 
 WORKDIR /app
 COPY entrypoint.sh .
