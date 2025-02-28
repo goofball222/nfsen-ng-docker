@@ -15,6 +15,13 @@ $nfsen_config = [
         'sources' => [
             'source1', 'source2',
         ],
+        'filters' => [
+            'proto udp',
+            'proto tcp',
+        ],
+        'formats' => [
+            'external_interfaces' => '%ts %td %pr %in %out %sa %sp %da %dp %ipkt %ibyt %opkt %obyt %flg',
+        ],
         'db' => 'RRD',
         'processor' => 'NfDump',
     ],
@@ -33,6 +40,11 @@ $nfsen_config = [
             'statistics' => [
                 'order_by' => 'bytes',
             ],
+            'table'=> [
+                'hidden_fields' => [
+                    'flg', 'fwd', 'in', 'out', 'sas', 'das'
+                ],
+            ]
         ],
     ],
     'nfdump' => [
